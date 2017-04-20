@@ -2,6 +2,11 @@
 This is a Python package used to produce various performance plots for the HGCAL trigger prmitive generation studies.
 
 ## Installation
+First clone the package:
+```bash
+git clone git@github.com:PFCal-dev/HGCTPGPerformance.git HGCTPGPerformance
+```
+
 This package depends on several python packages, listed in `requirements.txt`:
 * `scipy`
 * `numpy`
