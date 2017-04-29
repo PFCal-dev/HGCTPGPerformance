@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 from hgc_tpg.resolution.resolution import *
-from utilities.parameters import parameters
+from hgc_tpg.resolution.parameters import parameters
 
 def main(input_file, output_file):
     print 'Input file: ',input_file

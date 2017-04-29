@@ -3,7 +3,7 @@
 # The class provide a function that create an output file and store pt,eta,phi response #
 
 import ROOT
-import utilities.functions as f
+import hgc_tpg.utilities.functions as f
 import numpy as np
 
 class resolution :
