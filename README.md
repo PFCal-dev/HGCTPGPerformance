@@ -8,6 +8,7 @@ git clone git@github.com:PFCal-dev/HGCTPGPerformance.git HGCTPGPerformance
 ```
 
 This package depends on several python packages, listed in `requirements.txt`:
+* `attrs`
 * `scipy`
 * `numpy`
 * `pandas`
@@ -32,7 +33,11 @@ The package code is located in `hgc_tpg`. It is divided in sub-directories corre
 * `efficiency`: study of efficiencies (including turn-ons)
 * `rate`: study of trigger rates
 * `bandwidth`: study of the bandwidth between layers of the TPG system
+* `utilities`: general utility functions
+* `plotting`: plotting functions and style definitions
 
-This code is used from scripts located in the `scripts` directory. Right now, only an empty exemple script is given.
+This code is used from scripts located in the `scripts` directory. The scripts currently available are:
+* `runResolution.py`: energy and position resolution plots
+* `turnon.py`: turnon plot
 
 
