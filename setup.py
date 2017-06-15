@@ -5,6 +5,7 @@ setup(
     version = '0.0.1',
     packages = ['hgc_tpg'],
     install_requires = [
+        'attrs',
         'scipy',
         'numpy',
         'pandas',
