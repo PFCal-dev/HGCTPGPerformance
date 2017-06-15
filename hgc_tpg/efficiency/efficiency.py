@@ -2,7 +2,7 @@ import numpy as np
 from rootpy.plotting import Hist, Graph
 from root_numpy import fill_hist
 
-turnon_binning_default = [-20,-10,-7,-5,-4,-3,-2,-1,0,1,2,3,4,5,7,10,15,20,30]
+turnon_binning_default = [-30,-20,-10,-7,-5,-4,-3,-2,-1,0,1,2,3,4,5,7,10,15,20,30]
 def turnon(ref_pt, l1_pt, threshold, bins=None):
     if bins==None:
         print 'WARNING: Turnon binning not specified. Default binning will be used:'
