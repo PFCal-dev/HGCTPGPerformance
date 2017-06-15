@@ -2,11 +2,14 @@
 import numpy as np
 import ROOT
 from hgc_tpg.utilities.matching import match_etaphi
+from hgc_tpg.efficiency.efficiency import turnon
 
 def main(input_file, output_file):
     input_tree = ROOT.TChain('hgcalTriggerNtuplizer/HGCalTriggerNtuple')
     input_tree.Add(input_file)
     nentries = input_tree.GetEntries()
+    ref_pt = []
+    l1_pt = []
     for entry in xrange(nentries):
         if nentries<100 or entry%(nentries/100)==0:
             print 'Event {0}/{1}'.format(entry,nentries)
@@ -23,6 +26,14 @@ def main(input_file, output_file):
         if np.count_nonzero(gen_selection)>0:
             gen_etaphi = np.column_stack((gen_eta,gen_phi))[gen_selection]
             matched = match_etaphi(gen_etaphi, np.column_stack((cl3d_eta,cl3d_phi)), cl3d_pt)
+            for gen,l1 in matched.items():
+                ref_pt.append(gen_pt[gen_selection][gen])
+                l1_pt.append(cl3d_pt[l1])
+    matched_data = np.column_stack((ref_pt,l1_pt))
+    efficiency = turnon(np.array(ref_pt), np.array(l1_pt), threshold=30)
+    output = ROOT.TFile.Open(output_file, 'recreate')
+    efficiency.Write()
+    output.Close()
 
 if __name__=='__main__':
     import sys
