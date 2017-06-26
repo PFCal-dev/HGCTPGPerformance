@@ -39,5 +39,6 @@ The package code is located in `hgc_tpg`. It is divided in sub-directories corre
 This code is used from scripts located in the `scripts` directory. The scripts currently available are:
 * `runResolution.py`: energy and position resolution plots
 * `turnon.py`: turnon plot
+* `rate.py`: rate plot
 
 
