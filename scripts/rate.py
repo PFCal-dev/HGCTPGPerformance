@@ -2,7 +2,7 @@
 import numpy as np
 import ROOT
 from rootpy.plotting.style import set_style
-from hgc_tpg.utilities.tree import read_3dclusters
+from hgc_tpg.utilities.tree import read
 from hgc_tpg.rate.rate import rate
 
 from hgc_tpg.plotting.styles import style_rate
@@ -29,9 +29,9 @@ params = plot_rate.Parameters(
         )
 
 def main(input_file, output_file):
-    l1_pt = read_3dclusters(input_file, 'hgcalTriggerNtuplizer/HGCalTriggerNtuple')
+    l1_data = read(input_file, 'hgcalTriggerNtuplizer/HGCalTriggerNtuple')
     output = ROOT.TFile.Open(output_file, 'recreate')
-    rates = rate(l1_pt['cl3d_pt'], thresholds, total_events=l1_pt.shape[0])
+    rates = rate(l1_data['cl3d_pt'], thresholds, total_events=l1_data.shape[0])
     rates.Scale(nbunches*c_light/lhc_length*1.e-3)
     plot_rate.plot(params, rates)
     output = ROOT.TFile.Open(output_file, 'recreate')
