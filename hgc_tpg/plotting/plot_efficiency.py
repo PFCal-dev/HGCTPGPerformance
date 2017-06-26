@@ -39,10 +39,9 @@ def draw_axes(params):
 
 
 def draw_efficiency(params, efficiency):
-    ''' Draw 68% and 95% contours'''
     efficiency.markerstyle = params.efficiency_markerstyle
     efficiency.markersize = params.efficiency_markersize
-    efficiency.efficiency_markercolor = params.efficiency_markercolor
+    efficiency.markercolor = params.efficiency_markercolor
     efficiency.Draw('p')
 
 def draw_lines(params):
