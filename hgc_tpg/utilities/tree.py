@@ -1,5 +1,6 @@
 import numpy as np
 import ROOT
+from root_numpy import root2array
 from hgc_tpg.utilities.matching import match_etaphi
 
 # FIXME: temporary function
@@ -30,3 +31,23 @@ def read_and_match(input_file, tree_name):
                 ref_pt.append(gen_pt[gen_selection][gen])
                 l1_pt.append(cl3d_pt[l1])
     return np.array(ref_pt), np.array(l1_pt)
+
+
+def read_3dclusters(input_file, tree_name):
+    return root2array(input_file, tree_name, branches=['cl3d_pt'])
+    #  input_tree = ROOT.TChain(tree_name)
+    #  input_tree.Add(input_file)
+    #  nentries = input_tree.GetEntries()
+    #  l1_pt = []
+    #  event_runs = [[]]
+    #  for entry in xrange(nentries):
+        #  if nentries<100 or entry%(nentries/100)==0:
+            #  print 'Event {0}/{1}'.format(entry,nentries)
+        #  input_tree.GetEntry(entry)
+        #  event = input_tree.event
+        #  run = input_tree.run
+        #  cl3d_pt = np.array(input_tree.cl3d_pt)
+        #  l1_pt = np.append(l1_pt, cl3d_pt)
+        #  event_runs = np.concatenate((event_runs,) + ([[event,run]],)*len(cl3d_pt))
+        #  print event_runs
+    #  return  nentries, l1_pt, event_runs

@@ -8,7 +8,7 @@ from hgc_tpg.plotting.labels import HGCAL_label
 @attr.s
 class Parameters(object):
     '''Class encapsulating plot parameters/config.'''
-    name = attr.ib(validator=instance_of(str), default='turnon')
+    name = attr.ib(validator=instance_of(str), default='efficiency')
     # Axis
     xmin = attr.ib(validator=instance_of(float), default=0.)
     xmax = attr.ib(validator=instance_of(float), default=50.)
@@ -17,9 +17,9 @@ class Parameters(object):
     xtitle = attr.ib(validator=instance_of(str), default='p_{T}^{gen}')
     ytitle = attr.ib(validator=instance_of(str), default='Efficiency')
     # Graph
-    turnon_markerstyle = attr.ib(default='square')
-    turnon_markersize = attr.ib(validator=instance_of(float), default=1.)
-    turnon_markercolor = attr.ib(default=ROOT.kBlack)
+    efficiency_markerstyle = attr.ib(default='square')
+    efficiency_markersize = attr.ib(validator=instance_of(float), default=1.)
+    efficiency_markercolor = attr.ib(default=ROOT.kBlack)
     # Legend 
     legend_x1 = attr.ib(validator=instance_of(float), default=0.68)
     legend_y1 = attr.ib(validator=instance_of(float), default=0.76)
@@ -38,12 +38,11 @@ def draw_axes(params):
     return dummy_histo
 
 
-def draw_turnon(params, turnon):
-    ''' Draw 68% and 95% contours'''
-    turnon.markerstyle = params.turnon_markerstyle
-    turnon.markersize = params.turnon_markersize
-    turnon.turnon_markercolor = params.turnon_markercolor
-    turnon.Draw('p')
+def draw_efficiency(params, efficiency):
+    efficiency.markerstyle = params.efficiency_markerstyle
+    efficiency.markersize = params.efficiency_markersize
+    efficiency.markercolor = params.efficiency_markercolor
+    efficiency.Draw('p')
 
 def draw_lines(params):
     lines = []
@@ -62,10 +61,10 @@ def draw_lines(params):
 def draw_legends(params):
     return
 
-def plot(params, turnon):
+def plot(params, efficiency):
     canvas = Canvas(width=500, height=500)
     draw_axes(params)
-    draw_turnon(params, turnon)
+    draw_efficiency(params, efficiency)
     draw_lines(params)
     HGCAL_label(text='HGCAL Simulation',
             pad=canvas)
