@@ -4,57 +4,29 @@ import ROOT
 from rootpy.plotting.style import set_style
 from hgc_tpg.utilities.tree import read_and_match
 from hgc_tpg.efficiency.efficiency import turnon
-
 from hgc_tpg.plotting.styles import style_turnon
 from hgc_tpg.plotting import plot_efficiency
 
 
-# Plotting parameters and style
-set_style(style_turnon)
-params = plot_efficiency.Parameters(
-        name='turnon_Zee',
-        xmin=10.,
-        xmax=60.,
-        ymin=0.,
-        ymax=1.1,
-        xtitle='p_{T}^{gen} [GeV]',
-        ytitle='Efficiency',
-        efficiency_markerstyle='circle',
-        efficiency_markersize=1.2,
-        efficiency_markercolor=ROOT.kBlack,
-        legend_x1=0.70,
-        legend_y1=0.76,
-        legend_x2=0.70,
-        legend_y2=0.76,
-        legendtext_size=0.035,
-        legendtext_font=42,
-        )
-
-
-def main(input_file, output_file):
-    ref_pt, l1_pt = read_and_match(input_file, 'hgcalTriggerNtuplizer/HGCalTriggerNtuple')
-    efficiency = turnon(ref_pt, l1_pt, threshold=30)
-    plot_efficiency.plot(params, efficiency)
-    output = ROOT.TFile.Open(output_file, 'recreate')
-    efficiency.Write()
-    output.Close()
+def main(parameters):
+    set_style(style_turnon)
+    ref_pt, l1_pt = read_and_match(parameters.input_file, parameters.input_tree)
+    efficiency = turnon(ref_pt, l1_pt, threshold=parameters.threshold)
+    plot_efficiency.plot(parameters.plot_params, efficiency)
 
 if __name__=='__main__':
     import sys
+    import os
     import optparse
-
+    import importlib
     usage = 'usage: %prog [options]'
     parser = optparse.OptionParser(usage)
-    parser.add_option('--input', dest='input_file', help='Input file')
-    parser.add_option('--output', dest='output_file', help='Output file')
+    parser.add_option('--cfg', dest='parameter_file', help='Python file containing the definition of parameters ', default='pars.py')
     (opt, args) = parser.parse_args()
-    if not opt.input_file :
-        parser.print_help()
-        print 'Error: Missing input file name'
-        sys.exit(1)
-    if not opt.output_file :
-        parser.print_help()
-        print 'Error: Missing output file name'
-        sys.exit(1)
-    main(opt.input_file, opt.output_file)
+    current_dir = os.getcwd();
+    sys.path.append(current_dir)
+    # Remove the extension of the python file before module loading
+    if opt.parameter_file[-3:]=='.py': opt.parameter_file = opt.parameter_file[:-3]
+    parameters = importlib.import_module(opt.parameter_file).parameters
+    main(parameters)
 
