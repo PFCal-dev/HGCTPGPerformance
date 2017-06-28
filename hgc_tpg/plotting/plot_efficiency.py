@@ -73,3 +73,4 @@ def plot(params, efficiency):
     canvas.Print('%s.png'%params.name)
     canvas.Print('%s.pdf'%params.name)
     canvas.Print('%s.C'%params.name)
+    return canvas
