@@ -10,7 +10,15 @@ from hgc_tpg.plotting import plot_efficiency
 
 def main(parameters):
     set_style(style_turnon)
-    ref_pt, l1_pt = read_and_match(parameters.input_file, parameters.input_tree)
+    reference, l1 = read_and_match(
+            parameters.input_file, parameters.input_tree,
+            ref_variables=[parameters.reference_pt],
+            l1_variables=[parameters.l1_pt],
+            selection=parameters.reference_selection,
+            matching=parameters.matching
+            )
+    ref_pt = reference[parameters.reference_pt]
+    l1_pt = l1[parameters.l1_pt]
     efficiency = turnon(ref_pt, l1_pt, threshold=parameters.threshold)
     plot_efficiency.plot(parameters.plot_params, efficiency)
 
