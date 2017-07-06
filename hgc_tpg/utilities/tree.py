@@ -60,7 +60,6 @@ def read_and_match(input_file, tree_name,
         matching=PositionMatching()
         ):
     branch_names = list(set(ref_variables + l1_variables + selection.branch_list() + matching.branch_list()))
-    print branch_names
     events = root2array(input_file, tree_name, branches=branch_names)
     # prepare dictionary storing the output variables of matched objects
     ref_output = {key:[] for key in ref_variables}
@@ -76,7 +75,13 @@ def read_and_match(input_file, tree_name,
                     values.append(event[branch][selected][ref])
                 for branch,values in l1_output.items():
                     values.append(event[branch][l1])
-    return ref_output, l1_output
+    nvars = len(ref_output)+len(l1_output)
+    output = np.core.records.fromarrays(
+            np.array(ref_output.values()+l1_output.values()), 
+            names=ref_variables+l1_variables,
+            formats=['f8']*nvars
+            )
+    return output
 
 
 def read(input_file, tree_name, variables=['cl3d_pt', 'cl3d_eta', 'cl3d_phi']):
