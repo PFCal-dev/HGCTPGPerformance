@@ -7,68 +7,82 @@ from hgc_tpg.utilities.matching import match_etaphi
 
 
 @attr.s
-class Branches(object):
-    l1_pt = attr.ib(validator=instance_of(str), default='cl3d_pt')
-    l1_eta = attr.ib(validator=instance_of(str), default='cl3d_eta')
-    l1_phi = attr.ib(validator=instance_of(str), default='cl3d_phi')
-    ref_pt = attr.ib(validator=instance_of(str), default='gen_pt')
-    ref_eta = attr.ib(validator=instance_of(str), default='gen_eta')
-    ref_phi = attr.ib(validator=instance_of(str), default='gen_phi')
-    ref_id = attr.ib(validator=instance_of(str), default='gen_id')
-    ref_status = attr.ib(validator=instance_of(str), default='gen_status')
-
-    def l1(self):
-        return [self.l1_pt, self.l1_eta, self.l1_phi]
-
-    def ref(self):
-        return [self.ref_pt, self.ref_eta, self.ref_phi, self.ref_id, self.ref_status]
-
-
-@attr.s
-class Selection(object):
+class GenSelection(object):
+    # variable names
+    gen_pt = attr.ib(validator=instance_of(str), default='gen_pt')
+    gen_eta = attr.ib(validator=instance_of(str), default='gen_eta')
+    gen_id = attr.ib(validator=instance_of(str), default='gen_id')
+    gen_status = attr.ib(validator=instance_of(str), default='gen_status')
+    # Cuts
     eta_min = attr.ib(validator=instance_of(float), default=1.7)
     eta_max = attr.ib(validator=instance_of(float), default=2.8)
     pt_min = attr.ib(validator=instance_of(float), default=15.)
-    gen_id = attr.ib(validator=instance_of(int), default=11)
-    gen_status = attr.ib(validator=instance_of(int), default=1)
+    id = attr.ib(validator=instance_of(int), default=11)
+    status = attr.ib(validator=instance_of(int), default=1)
 
+    def branch_list(self):
+        return [self.gen_pt, self.gen_eta, self.gen_id, self.gen_status]
 
-def read_and_match(input_file, tree_name, branches=None, selection=None):
-    if selection==None:
-        selection = Selection()
-    if branches==None:
-        branches = Branches()
-    branch_names = branches.l1() + branches.ref()
-    events = root2array(input_file, tree_name, branches=branch_names)
-    selected_ref_pt = []
-    matched_l1_pt = []
-    for event in events:
-        ref_eta = event[branches.ref_eta]
-        ref_phi = event[branches.ref_phi]
-        ref_pt = event[branches.ref_pt]
-        ref_id = event[branches.ref_id]
-        ref_status = event[branches.ref_status]
-        l1_eta = event[branches.l1_eta]
-        l1_phi = event[branches.l1_phi]
-        l1_pt = event[branches.l1_pt]
-        ref_selection = np.logical_and.reduce((
-            np.abs(ref_eta)>selection.eta_min,
-            np.abs(ref_eta)<selection.eta_max,
-            ref_pt>selection.pt_min,
-            np.abs(ref_id)==selection.gen_id,
-            ref_status==selection.gen_status
+    def __call__(self, event):
+        gen_eta = event[self.gen_eta]
+        gen_pt = event[self.gen_pt]
+        gen_id = event[self.gen_id]
+        gen_status = event[self.gen_status]
+        return np.logical_and.reduce((
+            np.abs(gen_eta)>self.eta_min,
+            np.abs(gen_eta)<self.eta_max,
+            gen_pt>self.pt_min,
+            np.abs(gen_id)==self.id,
+            gen_status==self.status
             ))
-        if np.count_nonzero(ref_selection)>0:
-            ref_etaphi = np.column_stack((ref_eta,ref_phi))[ref_selection]
-            matched = match_etaphi(ref_etaphi, np.column_stack((l1_eta,l1_phi)), l1_pt)
+
+@attr.s
+class PositionMatching(object):
+    ref_position = attr.ib(validator=instance_of(tuple), default=('gen_eta', 'gen_phi'))
+    l1_position = attr.ib(validator=instance_of(tuple), default=('cl3d_eta', 'cl3d_phi'))
+    l1_pt = attr.ib(validator=instance_of(str), default='cl3d_pt')
+    matching_function = attr.ib(default=match_etaphi)
+
+    def branch_list(self):
+        return list(self.ref_position) + list(self.l1_position) + [self.l1_pt]
+
+    def __call__(self, event, ref_selection):
+        ref_pos =  np.column_stack((event[name] for name in self.ref_position))[ref_selection]
+        l1_pos =  np.column_stack((event[name] for name in self.l1_position))
+        l1_pt = event[self.l1_pt]
+        return self.matching_function(ref_pos, l1_pos, l1_pt)
+
+
+def read_and_match(input_file, tree_name,
+        ref_variables=['gen_pt'],
+        l1_variables=['cl3d_pt'],
+        selection=GenSelection(),
+        matching=PositionMatching()
+        ):
+    branch_names = list(set(ref_variables + l1_variables + selection.branch_list() + matching.branch_list()))
+    events = root2array(input_file, tree_name, branches=branch_names)
+    # prepare dictionary storing the output variables of matched objects
+    ref_output = {key:[] for key in ref_variables}
+    l1_output = {key:[] for key in l1_variables}
+    for event in events:
+        # Retrieve indices of selected reference objects
+        selected = selection(event)
+        if np.count_nonzero(selected)>0:
+            # matched L1 objects to reference objects
+            matched = matching(event, selected)
             for ref,l1 in matched.items():
-                selected_ref_pt.append(ref_pt[ref_selection][ref])
-                matched_l1_pt.append(l1_pt[l1])
-    return np.array(selected_ref_pt), np.array(matched_l1_pt)
+                for branch,values in ref_output.items():
+                    values.append(event[branch][selected][ref])
+                for branch,values in l1_output.items():
+                    values.append(event[branch][l1])
+    nvars = len(ref_output)+len(l1_output)
+    output = np.core.records.fromarrays(
+            np.array([ref_output[name] for name in ref_variables]+[l1_output[name] for name in l1_variables]), 
+            names=ref_variables+l1_variables,
+            formats=['f4']*nvars
+            )
+    return output
 
 
-def read(input_file, tree_name, branches=None):
-    if branches==None:
-        branches = Branches()
-    branch_names = branches.l1()
-    return root2array(input_file, tree_name, branches=branch_names)
+def read(input_file, tree_name, variables=['cl3d_pt', 'cl3d_eta', 'cl3d_phi']):
+    return root2array(input_file, tree_name, branches=variables)

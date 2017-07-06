@@ -8,10 +8,28 @@ from hgc_tpg.plotting.styles import style_turnon
 from hgc_tpg.plotting import plot_efficiency
 
 
+
 def main(parameters):
     set_style(style_turnon)
-    ref_pt, l1_pt = read_and_match(parameters.input_file, parameters.input_tree)
-    efficiency = turnon(ref_pt, l1_pt, threshold=parameters.threshold)
+    l1_variables = [parameters.l1_pt]
+    if parameters.identification_inputs!=None:
+        l1_variables = [parameters.l1_pt]+parameters.identification_inputs
+    data = read_and_match(
+            parameters.input_file, parameters.input_tree,
+            ref_variables=[parameters.reference_pt],
+            l1_variables=l1_variables,
+            selection=parameters.reference_selection,
+            matching=parameters.matching
+            )
+    ref_pt = data[parameters.reference_pt]
+    l1_pt = data[parameters.l1_pt]
+    identification_inputs = data[parameters.identification_inputs]\
+                .view((np.float32, len(parameters.identification_inputs)))
+    efficiency = turnon(ref_pt, l1_pt,
+            threshold=parameters.threshold,
+            selection_function=parameters.identification_function,
+            selection_inputs=identification_inputs
+            )
     plot_efficiency.plot(parameters.plot_params, efficiency)
 
 if __name__=='__main__':
