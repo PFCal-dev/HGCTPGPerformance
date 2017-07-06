@@ -77,9 +77,9 @@ def read_and_match(input_file, tree_name,
                     values.append(event[branch][l1])
     nvars = len(ref_output)+len(l1_output)
     output = np.core.records.fromarrays(
-            np.array(ref_output.values()+l1_output.values()), 
+            np.array([ref_output[name] for name in ref_variables]+[l1_output[name] for name in l1_variables]), 
             names=ref_variables+l1_variables,
-            formats=['f8']*nvars
+            formats=['f4']*nvars
             )
     return output
 

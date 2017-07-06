@@ -13,5 +13,7 @@ class TurnonParameters(object):
     reference_selection = attr.ib(default=GenSelection())
     matching = attr.ib(default=PositionMatching())
     threshold = attr.ib(validator=instance_of(float), default=30.)
+    identification_function=attr.ib(default=None)
+    identification_inputs=attr.ib(default=None)
     plot_params = attr.ib(validator=instance_of(EfficiencyPlotParameters), default=EfficiencyPlotParameters())
 

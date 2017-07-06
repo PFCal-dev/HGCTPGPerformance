@@ -46,6 +46,12 @@ matching = PositionMatching(
                 matching_function=match_etaphi
                 )
 
+
+def identification_test(inputs):
+  #  ncl = inputs[:,0]
+  ncl = inputs
+  return ncl>16
+
 # General turnon parameters
 parameters = TurnonParameters(
                 input_file='/afs/cern.ch/user/j/jsauvan/workspace/public/HGCAL/eg_trees/RelValZEE_14/ZEE_PU140_0/ntuple_*.root',
@@ -55,6 +61,8 @@ parameters = TurnonParameters(
                 reference_selection=selection,
                 matching=matching,
                 threshold=30.,
+                identification_function=identification_test,
+                identification_inputs=['cl3d_nclu'],
                 plot_params=plot_params
                 )
 

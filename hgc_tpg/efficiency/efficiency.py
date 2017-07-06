@@ -3,17 +3,28 @@ from rootpy.plotting import Hist, Graph
 from root_numpy import fill_hist
 
 turnon_binning_default = [-30,-20,-10,-7,-5,-4,-3,-2,-1,0,1,2,3,4,5,7,10,15,20,30]
-def turnon(ref_pt, l1_pt, threshold, bins=None):
+def turnon(ref_pt, l1_pt, threshold, selection_function=None, selection_inputs=None, bins=None):
     if bins==None:
         print 'WARNING: Turnon binning not specified. Default binning will be used:'
         bins = np.array(turnon_binning_default)+threshold
         bins = bins[bins>=0]
         print bins
+    # If no selection only apply pt threshold
+    pass_function = np.vectorize(lambda pt:pt>threshold) # pass threshold
+    inputs = l1_pt
+    # If additional selection (e.g. object identification)
+    # combine pt threshold and selection
+    if selection_function!=None:
+        pass_function = lambda (pt,sel_inputs):np.logical_and(\
+                np.vectorize(lambda x:x>threshold)(pt),\
+                selection_function(sel_inputs)\
+                )
+        inputs = (l1_pt, selection_inputs)
     return efficiency_graph(
-            np.vectorize(lambda pt:pt>threshold), # selection cut to be applied
-            np.array(l1_pt), 
-            np.array(ref_pt),
-            bins
+            selection_function=pass_function,
+            selection_inputs=inputs,
+            xs=ref_pt,
+            bins=bins
             )
 
 
