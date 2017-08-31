@@ -22,7 +22,7 @@ if [ ! -d ~/.virtualenvs/hgc_tpg/ ]; then
   mkvirtualenv hgc_tpg
   # deleting cached packages to force download
   rm -rf ~/.cache/pip/
-  pip install -r requirements.txt -I
+  pip install -r requirements.txt -I --no-cache-dir
   pip install -e .
 else
   export WORKON_HOME=~/.virtualenvs
