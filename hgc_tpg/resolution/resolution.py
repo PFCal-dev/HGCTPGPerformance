@@ -9,9 +9,9 @@ import numpy as np
 class resolution :
     
     def __init__(self, input_file, output_file, conf) :
-        self.inputNtuple = ROOT.TFile.Open(input_file)
+        self.chain = ROOT.TChain("hgcalTriggerNtuplizer/HGCalTriggerNtuple")
+        self.chain.Add(input_file)
         self.outputFile = output_file
-        self.chain = self.inputNtuple.Get("hgcalTriggerNtuplizer/HGCalTriggerNtuple")
         self.cfg = conf
 
     # function that produce the response plot - looking to dR-match between gen-C3d #
@@ -21,8 +21,8 @@ class resolution :
         # definition of the output file and histogram to store in it
         output = ROOT.TFile(self.outputFile+".root","RECREATE")
         h_resoPt = ROOT.TH1D("resoPt","Pt response",100, 0, 2)
-        h_resoEta = ROOT.TH1D("resoEta","Eta response",100, -0.15, 0.15);
-        h_resoPhi = ROOT.TH1D("resoPhi","Phi response",100, -0.15, 0.15);
+        h_resoEta = ROOT.TH1D("resoEta","Eta response",100, -0.02, 0.02);
+        h_resoPhi = ROOT.TH1D("resoPhi","Phi response",100, -0.05, 0.05);
         h_L1PtvsTrue2D = ROOT.TH2D("h_L1PtvsTrue2D","h_L1PtvsTrue2D",200, 0, 200, 201, -1, 200);
 
         self.chain.Print()
@@ -82,6 +82,7 @@ class resolution :
                     h_resoPhi.Fill( phi_cand - gen_phi_[i_gen] )
 
         # write histograms into output file
+        output.cd()
         h_resoPt.Write()
         h_resoEta.Write()
         h_resoPhi.Write()
