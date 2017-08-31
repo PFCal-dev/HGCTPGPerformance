@@ -37,6 +37,6 @@ else
     echo "Updating dependencies"
     # deleting cached packages to force download
     rm -rf ~/.cache/pip/
-    pip install -r requirements.txt -I
+    pip install -r requirements.txt -I --no-cache-dir
   fi
 fi
