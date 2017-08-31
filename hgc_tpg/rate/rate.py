@@ -9,6 +9,7 @@ def pass_threshold(et, thresholds):
     thresholds_sorted = np.sort(np.unique(thresholds))
     pass_thresholds = np.zeros(len(thresholds_sorted))
     for event in et:
+        if len(event)==0: continue
         et_max = np.max(event)
         pass_threshold = thresholds_sorted < et_max
         pass_thresholds += pass_threshold

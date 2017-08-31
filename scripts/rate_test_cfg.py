@@ -19,7 +19,7 @@ plot_params = RatePlotParameters(
 
 # General rate parameters
 parameters = RateParameters(
-                input_file='/home/llr/cms/sauvan/DATA/HGCAL/Ntuples/rate_study/SingleNeutrino/NuGun_PU200_L1T/170628/ntuple*.root',
+                input_file='/afs/cern.ch/user/j/jsauvan/workspace/public/HGCAL/rate_trees/SingleNeutrino/NuGun_PU200_L1T/170628/ntuple_*.root',
                 input_tree='hgcalTriggerNtuplizer/HGCalTriggerNtuple',
                 thresholds=np.arange(5.,100., 1.),
                 scale_factor=rate2kHz,
